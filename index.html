@@ -154,6 +154,28 @@ body{background:radial-gradient(ellipse at 90% 0%,#19263b 0%,#0d101b 46%);min-he
 .notes-open{display:inline-block;padding:13px 17px;margin:12px 0;background:#405b8b;color:#fff;border:1px solid #7895c6;border-radius:12px;font-size:14px;font-weight:800;text-decoration:none}
 .notes-open:focus-visible{outline:2px solid #d8e5ff;outline-offset:3px}
 
+
+.analytics-controls{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin:20px 0}
+.analytics-period{display:flex;gap:4px;padding:4px;background:#152238;border-radius:12px}
+.analytics-period button{border:0;border-radius:9px;padding:10px 12px;background:transparent;color:#bbcae0;font-weight:750}
+.analytics-period button.selected{background:#526fa9;color:white}
+.analytics-controls label{font-size:12px;color:#b8c8df}
+.analytics-controls select{margin-left:8px;max-width:190px;padding:10px;background:#162338;color:white;border:1px solid #50617c;border-radius:10px}
+.analytics-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.analytics-stats>div{min-width:0;background:#18263b;border:1px solid #354a67;border-radius:15px;padding:14px 10px}
+.analytics-stats small{display:block;color:#adbed5;font-size:11px}
+.analytics-stats strong{display:block;font-size:clamp(21px,4vw,31px);margin-top:8px}
+.analytics-chart{margin-top:16px;background:#18263b;border:1px solid #354a67;border-radius:16px;padding:17px 12px}
+.analytics-chart b{font-size:13px}
+.analytics-bars{height:155px;display:flex;align-items:end;gap:3px;margin-top:16px;border-bottom:1px solid #51627a;background:repeating-linear-gradient(to top,transparent 0,transparent calc(25% - 1px),#283a51 calc(25% - 1px),#283a51 25%)}
+.analytics-bar{flex:1;min-width:0;background:linear-gradient(0deg,#658be0,#b09cff);border-radius:4px 4px 0 0;transition:height .35s ease}
+.analytics-bar.empty{background:#3c4a61;min-height:2px}
+.analytics-weeks{gap:7px}
+.analytics-weeks .analytics-bar{background:linear-gradient(0deg,#409e90,#78d6ae)}
+.analytics-weeks .analytics-bar.empty{background:#3c4a61}
+.analytics-axis{display:flex;justify-content:space-between;font-size:11px;color:#9eafc8;margin-top:8px}
+@media(max-width:450px){.analytics-stats{gap:5px}.analytics-stats>div{padding:12px 7px}.analytics-stats small{font-size:10px}.analytics-bars{gap:2px}}
+@media(prefers-reduced-motion:reduce){.analytics-bar{transition:none}}
 </style>
 
 </head>
@@ -261,7 +283,7 @@ body{background:radial-gradient(ellipse at 90% 0%,#19263b 0%,#0d101b 46%);min-he
 <section class="future-panel" id="focus"><h2>Focus</h2><p>Priorities and deep-work sessions are planned for a future update.</p></section>
 <section class="future-panel" id="family"><h2>Family</h2><p>Make space for the people who matter. Coming in a future update.</p></section>
 <section class="future-panel" id="path"><h2>Own Path</h2><p>Choose your direction and create your own way. Coming in a future update.</p></section>
-<section class="future-panel" id="analytics"><h2>Analytics</h2><p>Today, week, month and consistency heatmap above already use your Notion data. More insights are planned.</p></section>
+<section class="panel" id="analytics"><div class="panelhead"><h2>Analytics 2.0</h2><span class="muted">NOTION · LIVE DATA</span></div><p class="muted">Your habits over time. Missing days count as incomplete.</p><div class="analytics-controls"><div class="analytics-period"><button data-period="7">7 days</button><button class="selected" data-period="30">30 days</button><button data-period="90">90 days</button></div><label>Habit <select id="analytics-habit"></select></label></div><div class="analytics-stats"><div><small>Daily consistency</small><strong id="analytics-average">—</strong></div><div><small>Perfect days</small><strong id="analytics-perfect">—</strong></div><div><small>Selected habit</small><strong id="analytics-rate">—</strong></div></div><div class="analytics-chart"><b>Daily goals · <span id="analytics-range">30 days</span></b><div class="analytics-bars" id="analytics-bars" role="img"></div><div class="analytics-axis"><span id="analytics-start"></span><span id="analytics-end"></span></div></div><div class="analytics-chart"><b>Selected habit · last 12 weeks</b><div class="analytics-bars analytics-weeks" id="analytics-weeks" role="img"></div><div class="analytics-axis"><span>12 weeks ago</span><span>This week</span></div></div><p class="muted">Daily consistency measures the three daily goals. Weekly bars show completed days for the selected habit.</p></section>
 
 <section class="panel" id="notes">
 <div class="panelhead"><h2>Notes · Idea Vault</h2><span class="muted">JARVIS × VENCE</span></div>
@@ -426,6 +448,63 @@ if(t<1)node._animation=requestAnimationFrame(step);
 node._animation=requestAnimationFrame(step);
 }
 
+
+let analyticsPeriod=30,analyticsHabit='Take Vitamins';
+function analyticsCompleted(log,name){
+if(!log)return false;
+const goal=weeklyGoals.find(g=>g.name===name);
+return goal?goal.fields.some(f=>log.checks?.[f]===true):log.checks?.[name]===true;
+}
+function renderAnalytics(){
+if(!state)return;
+const map=new Map(state.logs.map(log=>[log.date,log]));
+const today=fromIso(state.today),days=[];
+for(let i=analyticsPeriod-1;i>=0;i--){
+const d=new Date(today);d.setDate(today.getDate()-i);
+const date=iso(d),log=map.get(date);
+days.push({date,score:percent(log||{date,checks:{}}),done:analyticsCompleted(log,analyticsHabit)});
+}
+const avg=Math.round(days.reduce((n,d)=>n+d.score,0)/days.length);
+$('analytics-average').textContent=avg+'%';
+$('analytics-perfect').textContent=days.filter(d=>d.score===100).length+' / '+analyticsPeriod;
+$('analytics-rate').textContent=Math.round(days.filter(d=>d.done).length/days.length*100)+'%';
+$('analytics-range').textContent=analyticsPeriod+' days';
+$('analytics-start').textContent=days[0].date.slice(5);
+$('analytics-end').textContent=state.today.slice(5);
+const bars=$('analytics-bars');bars.replaceChildren();
+for(const day of days){
+const bar=document.createElement('div');bar.className='analytics-bar'+(day.score?'':' empty');
+bar.style.height=Math.max(1,day.score)+'%';bar.title=day.date+' · '+day.score+'%';bars.append(bar);
+}
+bars.setAttribute('aria-label','Daily goals, '+avg+'% average across '+analyticsPeriod+' days');
+const weeks=$('analytics-weeks');weeks.replaceChildren();
+const monday=weekStart(state.today);monday.setDate(monday.getDate()-77);
+for(let i=0;i<12;i++){
+let count=0;
+const start=new Date(monday);start.setDate(monday.getDate()+7*i);
+for(let j=0;j<7;j++){
+const d=new Date(start);d.setDate(start.getDate()+j);
+const key=iso(d);if(key<=state.today&&analyticsCompleted(map.get(key),analyticsHabit))count++;
+}
+const bar=document.createElement('div');bar.className='analytics-bar'+(count?'':' empty');
+bar.style.height=Math.max(1,count/7*100)+'%';bar.title=iso(start)+' · '+count+'/7 days';weeks.append(bar);
+}
+weeks.setAttribute('aria-label',analyticsHabit+' completion in the last 12 weeks');
+}
+function initAnalytics(){
+const selector=$('analytics-habit');
+for(const name of [...scheduled(''),...weeklyGoals.map(g=>g.name)]){
+const opt=document.createElement('option');opt.value=name;opt.textContent=name;selector.append(opt);
+}
+selector.value=analyticsHabit;
+selector.onchange=()=>{analyticsHabit=selector.value;renderAnalytics();};
+document.querySelectorAll('.analytics-period button').forEach(button=>button.onclick=()=>{
+analyticsPeriod=Number(button.dataset.period);
+document.querySelectorAll('.analytics-period button').forEach(b=>b.classList.toggle('selected',b===button));
+renderAnalytics();
+});
+}
+
 function render(){
 
 if(!state)return;
@@ -525,6 +604,8 @@ cell.title=key+': '+(log?percent(log)+'%':'No entry');
 heat.append(cell);
 
 }
+
+renderAnalytics();
 
 const container=$('habits');
 
@@ -714,6 +795,7 @@ $('status').className='status error';
 
 }
 
+initAnalytics();
 load();
 
 </script>
