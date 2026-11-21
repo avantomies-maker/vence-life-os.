@@ -102,6 +102,37 @@ button:disabled,input:disabled{opacity:.55;cursor:wait}
 
 @media(min-width:700px){.wrap{padding:50px 32px}.hero{height:310px}.rings{gap:20px}.ringcard{padding:25px}.panel{padding:30px}.heat{gap:9px}.pill{font-size:13px}}
 
+
+/* LIFE OS 2.0 visual layer — preserves Notion state and habit behavior */
+:root{color-scheme:dark}
+body{background:radial-gradient(ellipse at 90% 0%,#19263b 0%,#0d101b 46%);min-height:100vh}
+.wrap{max-width:1140px}
+.head{align-items:center}
+.logo{font-size:clamp(35px,7vw,55px)}
+.sub{color:#a8b9d2}
+.pill{background:#263449;color:#c8d9f5;border:1px solid #3d4b65}
+.direction{margin:25px 0 18px;padding:23px 24px;background:linear-gradient(125deg,#202d43,#172235);border:1px solid #36465f;border-radius:24px}
+.eyebrow{font-size:11px;letter-spacing:.16em;color:#a6b9ff;font-weight:850}
+.direction h1{font-size:clamp(25px,5.5vw,42px);line-height:1.08;letter-spacing:-.055em;margin:10px 0}
+.direction p{font-size:12px;color:#c6d3e5;letter-spacing:.055em;margin:0}
+.life-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:18px 0 24px}
+.life-nav a{display:flex;align-items:center;gap:10px;padding:15px 13px;background:#202b3d;border:1px solid #34435b;border-radius:16px;color:#edf3ff;text-decoration:none;font-size:13px;font-weight:750;min-width:0}
+.life-nav a span{font-size:19px;line-height:1}
+.life-nav a.current{border-color:#8d9fee;background:#293653}
+.life-nav a:focus-visible{outline:2px solid #b5c6ff;outline-offset:3px}
+.hero{margin-top:10px;border-color:#46536a}
+.ringcard,.panel{background:#202b3d}
+.ringcard{border:1px solid #34435b}
+.inside{background:#202b3d}
+.panel{border:1px solid #34435b}
+.section-label{font-size:12px;color:#a6b9ff;letter-spacing:.12em;text-transform:uppercase;font-weight:850;margin:28px 0 12px}
+.future-panel{padding:23px;border:1px solid #34435b;background:#1b2638;border-radius:22px}
+.future-panel h2{font-size:22px;margin:0 0 8px}
+.future-panel p{color:#b9c8dc;font-size:13px;line-height:1.6;margin:0}
+.foot{color:#9baec9}
+@media(min-width:700px){.life-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.direction{padding:32px}}
+@media(max-width:380px){.life-nav a{font-size:12px;padding:13px 9px;gap:7px}}
+
 </style>
 
 </head>
@@ -116,7 +147,7 @@ button:disabled,input:disabled{opacity:.55;cursor:wait}
 
 <div class="logo">LIFE OS.</div>
 
-<div class="sub">BUILD THE LIFE YOU WANT.</div>
+<div class="sub">BUILD THE LIFE YOU WANT. · 2.0</div>
 
 </div>
 
@@ -124,6 +155,26 @@ button:disabled,input:disabled{opacity:.55;cursor:wait}
 
 </header>
 
+
+<section class="direction" aria-label="Life direction">
+<div class="eyebrow">YOUR LIFE DIRECTION</div>
+<h1>Design your freedom.</h1>
+<p>VISUALIZE → INTEND → CREATE → LIVE</p>
+</section>
+<nav class="life-nav" aria-label="LIFE OS sections">
+<a class="current" href="#dashboard" aria-current="page"><span>◈</span>Dashboard</a>
+<a href="#vision"><span>◉</span>Vision</a>
+<a href="#mindset"><span>✦</span>Mindset</a>
+<a href="#wealth"><span>↗</span>Wealth</a>
+<a href="#business"><span>✧</span>Digital Business &amp; AI</a>
+<a href="#body"><span>◇</span>Body</a>
+<a href="#nutrition"><span>◐</span>Nutrition</a>
+<a href="#focus"><span>◎</span>Focus</a>
+<a href="#family"><span>♡</span>Family</a>
+<a href="#path"><span>⌁</span>Own Path</a>
+<a href="#analytics"><span>▥</span>Analytics</a>
+</nav>
+<div id="dashboard" class="section-label">Dashboard · Your progress</div>
 <div class="hero">
 
 <svg viewBox="0 0 900 320" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -175,6 +226,18 @@ button:disabled,input:disabled{opacity:.55;cursor:wait}
 <div class="status" id="status">Connecting to Notion…</div>
 
 </section>
+
+
+<section class="future-panel" id="vision"><h2>Vision</h2><p>Visualize the life you want to create. Goal planning arrives in the next phase.</p></section>
+<section class="future-panel" id="mindset"><h2>Mindset</h2><p>Intention, awareness and Transurfing reflection. Coming in a future update.</p></section>
+<section class="future-panel" id="wealth"><h2>Wealth</h2><p>Financial independence and freedom metrics. Coming in a future update.</p></section>
+<section class="future-panel" id="business"><h2>Digital Business &amp; AI</h2><p>Build an independent remote business. Coming in a future update.</p></section>
+<section class="future-panel" id="body"><h2>Body</h2><p>Your existing workouts and daily habits remain active in the checklist above.</p></section>
+<section class="future-panel" id="nutrition"><h2>Nutrition</h2><p>Nutrition tracking is planned for a future update.</p></section>
+<section class="future-panel" id="focus"><h2>Focus</h2><p>Priorities and deep-work sessions are planned for a future update.</p></section>
+<section class="future-panel" id="family"><h2>Family</h2><p>Make space for the people who matter. Coming in a future update.</p></section>
+<section class="future-panel" id="path"><h2>Own Path</h2><p>Choose your direction and create your own way. Coming in a future update.</p></section>
+<section class="future-panel" id="analytics"><h2>Analytics</h2><p>Today, week, month and consistency heatmap above already use your Notion data. More insights are planned.</p></section>
 
 <div class="foot">LIFE OS · VENCE EDITION · Powered by Notion</div>
 
