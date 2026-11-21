@@ -598,78 +598,50 @@ $('status').className='status';
 
 }
 
-async function toggle(field,checked,checkbox){
-
-checkbox.disabled=true;
-
-$('status').textContent='Saving to Notion…';
-
-$('status').className='status';
-
-try{
-
-const response=await fetch('/api/state',{
-
-method:'POST',
-
-headers:{'Content-Type':'application/json'},
-
-body:JSON.stringify({
-
-date:state.today,
-
-habit:field,
-
-field:field,
-
-checked:checked
-
-})
-
-});
-
-const result=await response.json();
-
-if(!response.ok||result.ok===false){
-
-throw Error(result.error||'Save failed');
-
+// Optimistic habit updates: paint immediately, persist sequentially to avoid races.
+let saveQueue=Promise.resolve();
+let pendingSaves=0;
+function saveStatus(message,error=false){
+const node=$('status');
+node.textContent=message;
+node.className=error?'status error':'status';
 }
-
-const verify=await fetch('/api/state',{cache:'no-store'});
-
-const payload=await verify.json();
-
-if(!verify.ok)throw Error(payload.error||'Verification failed');
-
-const updated=normalizeState(payload);
-
-const day=updated.logs.find(log=>log.date===updated.today);
-
-if(!day||day.checks[field]!==checked){
-
-throw Error('Notion did not confirm the change');
-
+function setLocalCheck(date,field,value){
+let day=state.logs.find(log=>log.date===date);
+if(!day){day={date,checks:{}};state.logs.push(day);}
+day.checks[field]=value;
 }
-
-state=updated;
-
+function toggle(field,checked,control){
+if(!state)return;
+const date=state.today;
+const existing=state.logs.find(log=>log.date===date);
+const previous=existing?.checks?.[field]===true;
+if(previous===checked)return;
+// Update all progress visuals before making a network request.
+setLocalCheck(date,field,checked);
 render();
-
-}catch(error){
-
-checkbox.checked=!checked;
-
-$('status').textContent='Could not save: '+error.message;
-
-$('status').className='status error';
-
-}finally{
-
-checkbox.disabled=false;
-
+pendingSaves++;
+saveStatus('Syncing '+pendingSaves+' change'+(pendingSaves===1?'':'s')+' to Notion…');
+saveQueue=saveQueue.catch(()=>{}).then(async()=>{
+try{
+const response=await fetch('/api/state',{
+method:'POST',
+headers:{'Content-Type':'application/json'},
+body:JSON.stringify({date,habit:field,checked})
+});
+const result=await response.json();
+if(!response.ok||result.ok===false||!result.day||result.day[field]!==checked){
+throw Error(result.error||'Notion did not confirm the change');
 }
-
+pendingSaves--;
+saveStatus(pendingSaves?'Syncing '+pendingSaves+' change(s) to Notion…':'✓ Saved to Notion');
+}catch(error){
+pendingSaves--;
+const current=state.logs.find(log=>log.date===date);
+if(current?.checks?.[field]===checked){setLocalCheck(date,field,previous);render();}
+saveStatus('Could not save '+field+': '+error.message,true);
+}
+});
 }
 
 function startTimer(button){
