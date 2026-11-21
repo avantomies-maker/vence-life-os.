@@ -316,14 +316,14 @@ const weeklyGoals=[
 {name:'Cold Exposure',target:3,fields:['Cold Exposure'],hint:'Ice water or contrast shower · safety first'},
 {name:'Strength Training',target:3,fields:['Strength','Back Workout','Leg Day','Chest Workout'],write:'Strength'},
 {name:'Cardio / Swimming',target:1,fields:['Cardio']},
-{name:'Business Deep Work',target:3,fields:['Business Deep Work']},
 {name:'Reading / Learning',target:5,fields:['Reading']},
 {name:'Music Creation',target:3,fields:['Music']},
 {name:'Mobility / Stretching',target:4,fields:['Mobility','Stretching'],write:'Mobility'},
 {name:'Gifted Emotions',target:4,fields:['Gifted Emotions']},
 {name:'Own Path Experiment',target:1,fields:['Own Path Experiment']},
 {name:'Wealth Check',target:1,fields:['Wealth Check']},
-{name:'Weekly Life Review',target:1,fields:['Weekly Life Review']}
+{name:'Weekly Life Review',target:1,fields:['Weekly Life Review']},
+{name:'Business Deep Work',target:3,fields:['Business Deep Work']}
 ];
 function scheduled(date){return ['Take Vitamins','Back Roller','Journaling'];}
 function weekStart(date){const d=fromIso(date);d.setDate(d.getDate()-((d.getDay()+6)%7));return d;}
