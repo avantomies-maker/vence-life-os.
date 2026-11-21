@@ -9,7 +9,10 @@ const HABITS = [
   "Stretching",
   "Leg Day",
   "Core / Abs",
-  "Chest Workout"
+  "Chest Workout",
+  "Strength", "Cardio", "Mobility", "Reading", "Music", "Gifted Emotions",
+  "Planning", "Sleep 7h", "Cold Exposure", "Business Deep Work",
+  "Own Path Experiment", "Wealth Check", "Weekly Life Review"
 ];
 
 function todayInFinland() {
