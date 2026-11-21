@@ -153,6 +153,36 @@ body{background:radial-gradient(ellipse at 90% 0%,#19263b 0%,#0d101b 46%);min-he
 .idea-lead{font-size:15px!important;color:#f1f5ff!important}.idea-step{border-top:1px solid #3c4d65;padding:14px 0 4px}.idea-step b{font-size:14px;color:#d8e5ff}.idea-step p{margin:7px 0}
 .notes-open{display:inline-block;padding:13px 17px;margin:12px 0;background:#405b8b;color:#fff;border:1px solid #7895c6;border-radius:12px;font-size:14px;font-weight:800;text-decoration:none}
 .notes-open:focus-visible{outline:2px solid #d8e5ff;outline-offset:3px}
+
+/* Both goal types visible simultaneously: daily left, flexible right */
+.goals-side-by-side{display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.5fr);align-items:start;gap:16px;margin-top:20px}
+.goals-side-by-side>.panel{margin-top:0;min-width:0}
+.goals-side-by-side .weekly-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.goals-side-by-side .weekly-goal{min-width:0}
+@media(max-width:950px){
+.goals-side-by-side{grid-template-columns:minmax(0,0.85fr) minmax(0,1.15fr);gap:12px}
+.goals-side-by-side .weekly-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:600px){
+.goals-side-by-side{grid-template-columns:minmax(0,0.82fr) minmax(0,1.18fr);gap:8px}
+.goals-side-by-side>.panel{padding:12px 9px;border-radius:16px}
+.goals-side-by-side .panelhead{display:block}
+.goals-side-by-side .panelhead h2{font-size:16px}
+.goals-side-by-side .panelhead .muted{display:block;margin-top:5px;font-size:10px}
+.goals-side-by-side .weekly-grid{gap:8px;margin-top:12px}
+.goals-side-by-side .weekly-goal{padding:10px 8px;border-radius:12px}
+.goals-side-by-side .weekly-goal-head{flex-wrap:wrap;gap:4px}
+.goals-side-by-side .weekly-goal-name{font-size:12px;overflow-wrap:anywhere}
+.goals-side-by-side .weekly-count{font-size:11px}
+.goals-side-by-side .weekly-days{font-size:10px}
+.goals-side-by-side .weekly-action{font-size:11px;padding:9px 7px;max-width:100%;white-space:normal;text-align:left}
+.goals-side-by-side .habit{gap:7px;padding:12px 0;flex-wrap:wrap}
+.goals-side-by-side .habitname{font-size:12px;overflow-wrap:anywhere}
+.goals-side-by-side .hint{font-size:10px}
+.goals-side-by-side .check{width:22px;height:22px}
+.goals-side-by-side .timer{font-size:11px;min-width:0;padding:8px}
+.goals-side-by-side .status{font-size:11px;overflow-wrap:anywhere}
+}
 </style>
 
 </head>
@@ -228,11 +258,18 @@ body{background:radial-gradient(ellipse at 90% 0%,#19263b 0%,#0d101b 46%);min-he
 
 </div>
 
+<div class="goals-side-by-side">
+<section class="panel daily-goals-panel" id="daily-goals-panel">
+<div class="panelhead"><h2>Daily goals</h2><span class="muted" id="date"></span></div>
+<div id="habits"></div>
+<div class="status" id="status">Connecting to Notion…</div>
+</section>
 <section class="panel" id="weekly-goals-panel">
 <div class="panelhead"><h2>Flexible weekly goals</h2><span class="muted">Any days · Monday–Sunday</span></div>
 <p class="muted">Choose when to act. Each session is saved to Notion; weekly targets reset automatically, history stays.</p>
 <div id="weekly-goals" class="weekly-grid"></div>
 </section>
+</div>
 <section class="panel">
 
 <div class="panelhead"><h2>Consistency heatmap</h2><span class="muted">Last 12 weeks</span></div>
@@ -243,15 +280,7 @@ body{background:radial-gradient(ellipse at 90% 0%,#19263b 0%,#0d101b 46%);min-he
 
 </section>
 
-<section class="panel">
 
-<div class="panelhead"><h2>Today's checklist</h2><span class="muted" id="date"></span></div>
-
-<div id="habits"></div>
-
-<div class="status" id="status">Connecting to Notion…</div>
-
-</section>
 
 
 <section class="future-panel" id="vision"><h2>Vision</h2><p>Visualize the life you want to create. Goal planning arrives in the next phase.</p></section>
