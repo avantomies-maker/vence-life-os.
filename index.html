@@ -133,6 +133,18 @@ body{background:radial-gradient(ellipse at 90% 0%,#19263b 0%,#0d101b 46%);min-he
 @media(min-width:700px){.life-nav{grid-template-columns:repeat(4,minmax(0,1fr))}.direction{padding:32px}}
 @media(max-width:380px){.life-nav a{font-size:12px;padding:13px 9px;gap:7px}}
 
+
+.weekly-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:12px;margin-top:18px}
+.weekly-goal{padding:16px;background:#1b283c;border:1px solid #384b65;border-radius:17px}
+.weekly-goal-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.weekly-goal-name{font-weight:800;font-size:14px}
+.weekly-count{font-weight:850;color:#a6b9ff;white-space:nowrap}
+.weekly-track{height:8px;background:#38445a;border-radius:99px;overflow:hidden;margin:12px 0}
+.weekly-fill{height:100%;background:#79b5ff;border-radius:99px}
+.weekly-days{font-size:11px;color:#9eafc8;margin-bottom:12px}
+.weekly-action{border:1px solid #647b9f;border-radius:11px;background:#293b55;color:#f4f7ff;padding:9px 12px;font-size:12px;font-weight:750}
+.weekly-action.done{background:#245342;border-color:#439875}
+.weekly-action:disabled{opacity:.5}
 </style>
 
 </head>
@@ -207,6 +219,11 @@ body{background:radial-gradient(ellipse at 90% 0%,#19263b 0%,#0d101b 46%);min-he
 
 </div>
 
+<section class="panel" id="weekly-goals-panel">
+<div class="panelhead"><h2>Flexible weekly goals</h2><span class="muted">Any days · Monday–Sunday</span></div>
+<p class="muted">Choose when to act. Each session is saved to Notion; weekly targets reset automatically, history stays.</p>
+<div id="weekly-goals" class="weekly-grid"></div>
+</section>
 <section class="panel">
 
 <div class="panelhead"><h2>Consistency heatmap</h2><span class="muted">Last 12 weeks</span></div>
@@ -273,12 +290,45 @@ let state=null;
 
 let activeTimer=null;
 
-function scheduled(date){
 
-const day=fromIso(date).getDay();
-
-return ['Take Vitamins','Back Roller',...(day>0&&day<6?[workouts[day]]:[])];
-
+const weeklyGoals=[
+{name:'Cold Exposure',target:3,fields:['Cold Exposure'],hint:'Ice water or contrast shower · safety first'},
+{name:'Strength Training',target:3,fields:['Strength','Back Workout','Leg Day','Chest Workout'],write:'Strength'},
+{name:'Cardio / Swimming',target:1,fields:['Cardio']},
+{name:'Business Deep Work',target:3,fields:['Business Deep Work']},
+{name:'Reading / Learning',target:5,fields:['Reading']},
+{name:'Music Creation',target:3,fields:['Music']},
+{name:'Mobility / Stretching',target:4,fields:['Mobility','Stretching'],write:'Mobility'},
+{name:'Gifted Emotions',target:4,fields:['Gifted Emotions']},
+{name:'Own Path Experiment',target:1,fields:['Own Path Experiment']},
+{name:'Wealth Check',target:1,fields:['Wealth Check']},
+{name:'Weekly Life Review',target:1,fields:['Weekly Life Review']}
+];
+function scheduled(date){return ['Take Vitamins','Back Roller'];}
+function weekStart(date){const d=fromIso(date);d.setDate(d.getDate()-((d.getDay()+6)%7));return d;}
+function weeklyCount(goal,map,dates){
+return dates.filter(date=>goal.fields.some(field=>map.get(date)?.checks?.[field]===true)).length;
+}
+function renderWeekly(map,dates,today){
+const container=$('weekly-goals');container.replaceChildren();
+for(const goal of weeklyGoals){
+const count=weeklyCount(goal,map,dates);
+const field=goal.write||goal.fields[0];
+const checked=!!today.checks[field]||goal.fields.some(x=>today.checks[x]===true);
+const card=document.createElement('div');card.className='weekly-goal';
+const head=document.createElement('div');head.className='weekly-goal-head';
+const name=document.createElement('span');name.className='weekly-goal-name';name.textContent=goal.name;
+const score=document.createElement('span');score.className='weekly-count';score.textContent=count+' / '+goal.target;
+head.append(name,score);
+const track=document.createElement('div');track.className='weekly-track';
+const fill=document.createElement('div');fill.className='weekly-fill';fill.style.width=Math.min(100,count/goal.target*100)+'%';track.append(fill);
+const detail=document.createElement('div');detail.className='weekly-days';detail.textContent=goal.hint||'Flexible weekly target · any day';
+const button=document.createElement('button');button.className='weekly-action'+(checked?' done':'');
+button.textContent=checked?'✓ Done today · Undo':count>=goal.target?'Extra session today':'Mark today complete';
+button.setAttribute('aria-label',(checked?'Undo ':'Complete ')+goal.name+' today');
+button.onclick=()=>toggle(field,!checked,button);
+card.append(head,track,detail,button);container.append(card);
+}
 }
 
 function normalizeLog(raw){
@@ -383,7 +433,9 @@ return Math.round(sum/dates.length);
 
 }
 
-ring('week',average(weekDates));
+const weeklyProgress=Math.round(100*weeklyGoals.reduce((sum,goal)=>sum+Math.min(1,weeklyCount(goal,map,weekDates)/goal.target),0)/weeklyGoals.length);
+ring('week',weeklyProgress);
+renderWeekly(map,weekDates,today);
 
 ring('month',average(monthDates));
 
