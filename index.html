@@ -176,6 +176,7 @@ body{background:radial-gradient(ellipse at 90% 0%,#19263b 0%,#0d101b 46%);min-he
 .analytics-axis{display:flex;justify-content:space-between;font-size:11px;color:#9eafc8;margin-top:8px}
 @media(max-width:450px){.analytics-stats{gap:5px}.analytics-stats>div{padding:12px 7px}.analytics-stats small{font-size:10px}.analytics-bars{gap:2px}}
 @media(prefers-reduced-motion:reduce){.analytics-bar{transition:none}}
+.mshero{display:flex;align-items:center;gap:20px;margin:16px 0 22px}.mshero h3{margin:0}.msitem{display:flex;align-items:flex-start;gap:12px;padding:13px 0;border-top:1px solid #ffffff15}.msitem details{flex:1;min-width:0}.msitem summary{cursor:pointer;font-weight:600}.msitem p{line-height:1.6}#msring{width:94px;height:94px;flex:none;border-radius:50%;background:conic-gradient(#a78bfa var(--ms,0%),#ffffff12 0);display:grid;place-items:center;position:relative}#msring:before{content:'';position:absolute;inset:7px;border-radius:50%;background:#141827}#mspercent{position:relative;font-size:21px}.msitem .check{flex:none}
 </style>
 
 </head>
@@ -275,7 +276,7 @@ body{background:radial-gradient(ellipse at 90% 0%,#19263b 0%,#0d101b 46%);min-he
 
 
 <section class="future-panel" id="vision"><h2>Vision</h2><p>Visualize the life you want to create. Goal planning arrives in the next phase.</p></section>
-<section class="future-panel" id="mindset"><h2>Mindset</h2><p>Intention, awareness and Transurfing reflection. Coming in a future update.</p></section>
+<section class="panel" id="mindset"><div class="panelhead"><h2>Mindset</h2><span class="muted">MASTER YOUR MIND</span></div><div class="mshero"><div id="msring"><strong id="mspercent">0%</strong></div><div><h3>Daily Mindset Progress</h3><p class="muted" id="mscount">0 / 10 rituals</p></div></div><article class="idea-card"><div class="eyebrow">DAILY WISDOM</div><p id="mswisdom"></p></article><div id="msgroups"><article class="idea-card"><h3>☀ Morning Ritual</h3><div class="msitem"><input type="checkbox" class="check" data-ms="Gratitude" aria-label="Complete Gratitude"><details><summary>Gratitude</summary><p class="muted">Name three things you appreciate right now.</p></details></div><div class="msitem"><input type="checkbox" class="check" data-ms="Visualization" aria-label="Complete Visualization"><details><summary>Visualization</summary><p class="muted">Imagine your desired life from your own perspective. Then identify one action you can take.</p><button type="button" class="timer" data-msseconds="180">Start 3:00</button></details></div><div class="msitem"><input type="checkbox" class="check" data-ms="Daily Intention" aria-label="Complete Daily Intention"><details><summary>Daily Intention</summary><p class="muted">Choose one concrete action aligned with your goals.</p></details></div><div class="msitem"><input type="checkbox" class="check" data-ms="Release Importance" aria-label="Complete Release Importance"><details><summary>Release Importance</summary><p class="muted">Notice what you are trying to force. Choose a calmer, flexible approach.</p></details></div></article><article class="idea-card"><h3>◉ Daytime Awareness</h3><div class="msitem"><input type="checkbox" class="check" data-ms="Stay Conscious" aria-label="Complete Stay Conscious"><details><summary>Stay Conscious</summary><p class="muted">Notice an automatic reaction and choose your response.</p></details></div><div class="msitem"><input type="checkbox" class="check" data-ms="Choose Your Own Path" aria-label="Complete Choose Your Own Path"><details><summary>Choose Your Own Path</summary><p class="muted">Question one assumption. Explore an alternative that fits your values.</p></details></div><div class="msitem"><input type="checkbox" class="check" data-ms="Shift Perspective" aria-label="Complete Shift Perspective"><details><summary>Shift Perspective</summary><p class="muted">Acknowledge the facts, then look for a constructive interpretation.</p></details></div></article><article class="idea-card"><h3>☾ Evening Ritual</h3><div class="msitem"><input type="checkbox" class="check" data-ms="Daily Reflection" aria-label="Complete Daily Reflection"><details><summary>Daily Reflection</summary><p class="muted">What moved you forward? What would you change tomorrow?</p></details></div><div class="msitem"><input type="checkbox" class="check" data-ms="Three Daily Wins" aria-label="Complete Three Daily Wins"><details><summary>Three Daily Wins</summary><p class="muted">Recall three meaningful moments or small achievements.</p></details></div><div class="msitem"><input type="checkbox" class="check" data-ms="Evening Visualization" aria-label="Complete Evening Visualization"><details><summary>Evening Visualization</summary><p class="muted">Picture a meaningful tomorrow and let go of the need to control every outcome.</p><button type="button" class="timer" data-msseconds="120">Start 2:00</button></details></div></article></div><article class="idea-card"><h3>Gratitude Journal</h3><p class="muted">Write three things you appreciate in your private Notion workspace. Personal entries are not sent through this site's public API.</p><a class="notes-open" href="https://app.notion.com/p/25f0a419bc77445495617252ad6f4b4c" target="_blank" rel="noopener noreferrer">Open Daily Log in Notion ↗</a></article></section>
 <section class="future-panel" id="wealth"><h2>Wealth</h2><p>Financial independence and freedom metrics. Coming in a future update.</p></section>
 <section class="future-panel" id="business"><h2>Digital Business &amp; AI</h2><p>Build an independent remote business. Coming in a future update.</p></section>
 <section class="future-panel" id="body"><h2>Body</h2><p>Your existing workouts and daily habits remain active in the checklist above.</p></section>
@@ -393,7 +394,7 @@ const source=raw.checks&&typeof raw.checks==='object'?raw.checks:raw;
 
 const checks={};
 
-for(const name of new Set([...labels,...weeklyGoals.flatMap(goal=>goal.fields)]))checks[name]=source[name]===true;
+for(const name of new Set([...labels,...weeklyGoals.flatMap(goal=>goal.fields),...mindsetFields]))checks[name]=source[name]===true;
 
 return {id:raw.id,date,checks};
 
@@ -606,6 +607,7 @@ heat.append(cell);
 }
 
 renderAnalytics();
+renderMindset();
 
 const container=$('habits');
 
@@ -814,6 +816,20 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('pageshow',resumeRefresh);
 window.addEventListener('focus',resumeRefresh);
 setInterval(()=>{if(document.visibilityState==='visible'&&state&&state.today!==finlandDate())resumeRefresh();},15000);
+const mindsetFields=["Mindset Gratitude","Mindset Visualization","Mindset Daily Intention","Mindset Release Importance","Mindset Stay Conscious","Mindset Choose Your Own Path","Mindset Shift Perspective","Mindset Daily Reflection","Mindset Three Daily Wins","Mindset Evening Visualization"];
+const wisdom=["Choose progress over pressure.","Your path does not need to look like anyone else's.","Appreciate what is here while building what comes next.","You can choose your response, even when you cannot choose the situation.","Imagine the direction. Take the next step.","Small deliberate actions shape your future.","Let ambition coexist with calm.","Stay curious about possibilities you have not considered.","Your worth is not measured by a checklist.","Focus on what you can influence today.","A setback can be information, not a verdict.","Make space for the life you want to build.","You do not need certainty to take a useful step.","Be present for the journey, not only the destination."];
+function renderMindset(){
+const checks=state.logs.find(d=>d.date===state.today)?.checks||{};
+const count=mindsetFields.filter(n=>checks[n]).length;
+$('mspercent').textContent=count*10+'%';
+$('msring').style.setProperty('--ms',count*10+'%');
+$('mscount').textContent=count+' / 10 rituals';
+$('mswisdom').textContent=wisdom[Math.floor(Date.parse(state.today+'T00:00:00Z')/86400000)%wisdom.length];
+document.querySelectorAll('[data-ms]').forEach(c=>{c.checked=!!checks['Mindset '+c.dataset.ms];});
+}
+document.querySelectorAll('[data-ms]').forEach(c=>{c.onchange=()=>toggle('Mindset '+c.dataset.ms,c.checked,c);});
+document.querySelectorAll('[data-msseconds]').forEach(btn=>{let interval=null;btn.onclick=()=>{const total=Number(btn.dataset.msseconds);if(interval){clearInterval(interval);interval=null;btn.textContent='Start '+total/60+':00';return;}const end=Date.now()+total*1000;const tick=()=>{const left=Math.max(0,Math.ceil((end-Date.now())/1000));btn.textContent=left?Math.floor(left/60)+':'+pad(left%60)+' · Stop':'Done ✓';if(!left){clearInterval(interval);interval=null;}};interval=setInterval(tick,250);tick();};});
+
 initAnalytics();
 load();
 
