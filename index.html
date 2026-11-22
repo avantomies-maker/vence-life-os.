@@ -682,6 +682,7 @@ $('status').className='status';
 // Optimistic habit updates: paint immediately, persist sequentially to avoid races.
 let saveQueue=Promise.resolve();
 let pendingSaves=0;
+let localRevision=0;
 function saveStatus(message,error=false){
 const node=$('status');
 node.textContent=message;
@@ -694,11 +695,13 @@ day.checks[field]=value;
 }
 function toggle(field,checked,control){
 if(!state)return;
+if(state.today!==finlandDate()){resumeRefresh();return;}
 const date=state.today;
 const existing=state.logs.find(log=>log.date===date);
 const previous=existing?.checks?.[field]===true;
 if(previous===checked)return;
 // Update all progress visuals before making a network request.
+localRevision++;
 setLocalCheck(date,field,checked);
 render();
 pendingSaves++;
@@ -771,30 +774,46 @@ tick();
 
 }
 
-async function load(){
-
+let refreshInFlight=null, refreshAgain=false;
+let lastRefresh=0;
+const finlandDate=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Helsinki',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+function load(){
+if(refreshInFlight)return refreshInFlight;
+refreshInFlight=(async()=>{
 try{
-
+await saveQueue;
+const revision=localRevision;
 const response=await fetch('/api/state',{cache:'no-store'});
-
 const payload=await response.json();
-
 if(!response.ok)throw Error(payload.error||'Request failed');
-
-state=normalizeState(payload);
-
+const next=normalizeState(payload);
+if(revision!==localRevision||pendingSaves){refreshAgain=true;return;}
+state=next;
 render();
-
+lastRefresh=Date.now();
 }catch(error){
-
-$('status').textContent='Notion connection error: '+error.message;
-
-$('status').className='status error';
-
+saveStatus('Notion connection error: '+error.message,true);
 }
-
+})().finally(()=>{
+refreshInFlight=null;
+if(refreshAgain){refreshAgain=false;load();}
+});
+return refreshInFlight;
 }
-
+function resumeRefresh(){
+if(document.visibilityState==='hidden')return;
+const today=finlandDate();
+if(state&&state.today!==today){
+state.today=today;
+render();
+saveStatus('New day · syncing with Notion…');
+}
+if(Date.now()-lastRefresh>1000||!state)load();
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')resumeRefresh();});
+window.addEventListener('pageshow',resumeRefresh);
+window.addEventListener('focus',resumeRefresh);
+setInterval(()=>{if(document.visibilityState==='visible'&&state&&state.today!==finlandDate())resumeRefresh();},15000);
 initAnalytics();
 load();
 
