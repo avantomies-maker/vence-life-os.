@@ -12,7 +12,8 @@ const HABITS = [
   "Chest Workout",
   "Strength", "Cardio", "Mobility", "Reading", "Music", "Gifted Emotions",
   "Planning", "Sleep 7h", "Cold Exposure", "Business Deep Work",
-  "Own Path Experiment", "Wealth Check", "Weekly Life Review", "Journaling"
+  "Own Path Experiment", "Wealth Check", "Weekly Life Review", "Journaling",
+  "Mindset Gratitude", "Mindset Visualization", "Mindset Daily Intention", "Mindset Release Importance", "Mindset Stay Conscious", "Mindset Choose Your Own Path", "Mindset Shift Perspective", "Mindset Daily Reflection", "Mindset Three Daily Wins", "Mindset Evening Visualization"
 ];
 
 function todayInFinland() {
