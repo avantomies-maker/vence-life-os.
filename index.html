@@ -553,7 +553,8 @@ return Math.round(sum/dates.length);
 }
 
 const weeklyProgress=Math.round(100*weeklyGoals.reduce((sum,goal)=>sum+Math.min(1,weeklyCount(goal,map,weekDates)/goal.target),0)/weeklyGoals.length);
-ring('week',weeklyProgress);
+// Weekly score combines daily consistency and flexible target attainment equally.
+ring('week',Math.round((average(weekDates)+weeklyProgress)/2));
 renderWeekly(map,weekDates,today);
 
 ring('month',average(monthDates));
